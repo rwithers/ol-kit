@@ -2,10 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import nanoid from 'nanoid'
 import debounce from 'lodash.debounce'
-import { StyledMap } from './styled'
+import MapLogo from './MapLogo'
 import { createMap, updateMapFromUrl, updateUrlFromMap } from './utils'
-import ugh from 'ugh'
+import { StyledMap } from './styled'
 import en from 'locales/en'
+import ugh from 'ugh'
 
 // context should only be created when <Map> is mounted (see constructor), otherwise it's null so child comps don't use context
 export let MapContext = null
@@ -77,7 +78,7 @@ class Map extends React.Component {
   }
 
   render () {
-    const { children, fullScreen, style } = this.props
+    const { children, fullScreen, mapLogoPosition, style } = this.props
     const { mapInitialized } = this.state
 
     return (
@@ -85,10 +86,11 @@ class Map extends React.Component {
         <StyledMap
           id={this.target}
           fullScreen={fullScreen}
-          style={style} />
+          style={style}>
+          <MapLogo mapLogoPosition={mapLogoPosition} />
+        </StyledMap>
         <MapContext.Provider value={this.getContextValue()}>
-          {
-            mapInitialized // wait for map to initialize before rendering children
+          {mapInitialized // wait for map to initialize before rendering children
               ? children
               : null
           }
@@ -101,6 +103,7 @@ class Map extends React.Component {
 Map.defaultProps = {
   fullScreen: false,
   map: null,
+  mapLogoPosition: 'left',
   onMapInit: () => {},
   updateUrlDebounce: 400,
   updateUrlFromView: true,
@@ -119,6 +122,8 @@ Map.propTypes = {
   fullScreen: PropTypes.bool,
   /** optionally pass a custom map */
   map: PropTypes.object,
+  /** place the ol-kit logo on the 'left', 'right', or set to 'none' to hide */
+  mapLogoPosition: PropTypes.string,
   /** callback called with initialized map object after optional animations complete
     note: if a <Promise> is returned from this function, Map will wait for onMapInit to resolve before rendering children
   */
